@@ -12,12 +12,22 @@ public class PlayerMovement : MonoBehaviour
 
     public Transform BoundaryHolder;
     // Start is called before the first frame update
+
+    Boundary playerBoundary;
+
     void Start()
     {
 
         playerSize = GetComponent<SpriteRenderer>().bounds.extents;
         rb = GetComponent<Rigidbody2D>();
-        
+
+        playerBoundary = new Boundary(
+            BoundaryHolder.GetChild(0).position.y,
+            BoundaryHolder.GetChild(1).position.y,
+            BoundaryHolder.GetChild(2).position.x,
+            BoundaryHolder.GetChild(3).position.x
+            );
+
     }
 
     // Update is called once per frame
@@ -28,9 +38,9 @@ public class PlayerMovement : MonoBehaviour
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-           if (wasJustClicked)
+            if (wasJustClicked)
             {
-               wasJustClicked = false;
+                wasJustClicked = false;
 
                 if ((mousePos.x >= transform.position.x && mousePos.x < transform.position.x + playerSize.x ||
                 mousePos.x <= transform.position.x && mousePos.x > transform.position.x - playerSize.x) &&
@@ -41,22 +51,27 @@ public class PlayerMovement : MonoBehaviour
                 }
                 else
                 {
+
                     canMove = false;
                 }
             }
 
-           if (canMove)
+            if (canMove)
             {
-                rb.MovePosition(mousePos);
+                Vector2 clampedMousePos = new Vector2(
+       Mathf.Clamp(mousePos.x, playerBoundary.Left, playerBoundary.Right),
+       Mathf.Clamp(mousePos.y, playerBoundary.Down, playerBoundary.Up)
+       );
+                rb.MovePosition(clampedMousePos);
             }
         }
 
-       else
+        else
         {
             wasJustClicked = true;
         }
     }
-        
-        
 
-    }
+
+
+}

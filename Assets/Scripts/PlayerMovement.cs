@@ -1,25 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
     bool wasJustClicked = true;
     bool canMove;
-    Vector2 playerSize;
 
     Rigidbody2D rb;
+    Vector2 startingPos;
 
     public Transform BoundaryHolder;
     // Start is called before the first frame update
 
     Boundary playerBoundary;
 
+    Collider2D playerCollider;
+    
     void Start()
     {
-
-        playerSize = GetComponent<SpriteRenderer>().bounds.extents;
         rb = GetComponent<Rigidbody2D>();
+        startingPos = rb.position;
+
+
+        playerCollider = GetComponent<Collider2D>();
 
         playerBoundary = new Boundary(
             BoundaryHolder.GetChild(0).position.y,
@@ -42,10 +44,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 wasJustClicked = false;
 
-                if ((mousePos.x >= transform.position.x && mousePos.x < transform.position.x + playerSize.x ||
-                mousePos.x <= transform.position.x && mousePos.x > transform.position.x - playerSize.x) &&
-                (mousePos.y >= transform.position.y && mousePos.y < transform.position.y + playerSize.y ||
-                mousePos.y <= transform.position.y && mousePos.y > transform.position.y - playerSize.y))
+                if (playerCollider.OverlapPoint(mousePos))
                 {
                     canMove = true;
                 }
@@ -72,6 +71,9 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-
+    public void ResetPlayer()
+    {
+        rb.position = startingPos;
+    }
 
 }
